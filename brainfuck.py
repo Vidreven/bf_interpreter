@@ -5,34 +5,45 @@ def brain_luck(code, input):
     memory = [0] * 30_000
     input_pointer = 0
     output = ''
-    start_loop = 0
-    end_loop = 0
     ip = 0
 
     while ip < len(code):
-        if code[ip] == '>':
+        instr = code[ip]
+        if instr == '>':
             data_pointer += 1
-        elif code[ip] == '<':
+        elif instr == '<':
             data_pointer -= 1
-        elif code[ip] == '+':
+        elif instr == '+':
             memory[data_pointer] = (memory[data_pointer] + 1) % 256
-        elif code[ip] == '-':
+        elif instr == '-':
             memory[data_pointer] = (memory[data_pointer] - 1) % 256
-        elif code[ip] == '.':
+        elif instr == '.':
             output += (chr(memory[data_pointer]))
-        elif code[ip] == ',':
+        elif instr == ',':
             memory[data_pointer] = ord(input_array[input_pointer])
             input_pointer += 1
-        elif code[ip] == '[':
-            start_loop = ip
+        elif instr == '[':
             if memory[data_pointer] == 0:
-                ip = end_loop
-        elif code[ip] == ']':
-            end_loop = ip
+                loop = 1
+                while loop > 0:
+                    ip += 1
+                    if code[ip] == '[':
+                        loop += 1
+                    elif code[ip] == ']':
+                        loop -= 1
+        elif instr == ']':
+            loop = 1
             if memory[data_pointer] != 0:
-                ip = start_loop
+                while loop > 0:
+                    ip -= 1
+                    if code[ip] == '[':
+                        loop -= 1
+                    elif code[ip] == ']':
+                        loop += 1
         else:
             raise Exception('Invalid instruction')
         ip += 1
 
     return output
+
+print(brain_luck(',>+>>>>++++++++++++++++++++++++++++++++++++++++++++>++++++++++++++++++++++++++++++++<<<<<<[>[>>>>>>+>+<<<<<<<-]>>>>>>>[<<<<<<<+>>>>>>>-]<[>++++++++++[-<-[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<[>>>+<<<-]>>[-]]<<]>>>[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<+>>[-]]<<<<<<<]>>>>>[++++++++++++++++++++++++++++++++++++++++++++++++.[-]]++++++++++<[->-<]>++++++++++++++++++++++++++++++++++++++++++++++++.[-]<<<<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<[-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]', chr(10)))
